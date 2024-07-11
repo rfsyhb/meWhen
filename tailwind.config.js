@@ -10,7 +10,7 @@ export default {
         cardAlt: '#EBEBEB',
       },
       fontFamily: {
-        body: ['Poppins', 'sans-serif'],
+        poppins: ['Poppins', 'sans-serif'],
       },
     },
   },
