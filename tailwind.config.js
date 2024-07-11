@@ -4,12 +4,10 @@ export default {
   theme: {
     extend: {
       colors: {
-        bekgron: '#141314',
-        text: '#E6E1E3',
-        card1: '#211F21',
-        card2: '#2E2D2E',
-        card3: '#282830',
-        card4: '#636363',
+        bgColor: '#E6E5E3',
+        text: '#141314',
+        cardMain: '#F4F5F2',
+        cardAlt: '#EBEBEB',
       },
       fontFamily: {
         body: ['Poppins', 'sans-serif'],
