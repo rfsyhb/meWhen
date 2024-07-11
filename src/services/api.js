@@ -27,7 +27,11 @@ const apiRequest = async (method, endpoint, data) => {
       url: endpoint,
       data,
     });
-    return response; // Return response to be handled elsewhere
+    const responseData = response.data; // Return response to be handled elsewhere
+    // if (responseData.status !== 'success') {
+    //   throw new Error(responseData.message);
+    // }
+    return responseData;
   } catch (error) {
     console.error('API request error: ', error.response || error.message);
     throw new Error(
