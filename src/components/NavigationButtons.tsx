@@ -26,7 +26,7 @@ export default function NavigationButtons({
       </Link>
       <Link to="/history">
         <button
-          className={`font-semibold px-4 py-1 bg-bgColor rounded-xl border-2 border-black hover:bg-text hover:text-white hover:border-black ${location === 'history' ? 'bg-text text-white border-black' : ''}`}
+          className={`font-semibold px-4 py-1 bg-bgColor rounded-xl border-2 border-black hover:bg-text hover:text-white hover:border-black ${location === '/history' ? 'bg-text text-white border-black' : ''}`}
         >
           History
         </button>
