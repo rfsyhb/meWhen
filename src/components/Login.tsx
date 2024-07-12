@@ -1,4 +1,8 @@
+import { useState } from 'react';
+
 export default function Login() {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
     <div className="flex flex-col w-full max-w-xl mx-auto min-h-[15rem] justify-center items-center gap-8 p-4">
       <div className="flex flex-row items-center justify-start gap-2 w-full">
@@ -19,7 +23,7 @@ export default function Login() {
           <input
             type="text"
             id="mewhen-username"
-            className="w-[70%] rounded-md bg-cardMain shadow-sm p-1 border border-black border-opacity-20 font-normal group-hover:border-opacity-70"
+            className={`w-[70%] rounded-md bg-cardMain shadow-sm p-1 border border-black border-opacity-20 font-normal group-hover:border-opacity-70 ${isHovered ? 'outline outline-1 outline-green-600' : 'outline-none'}`}
             required
           />
         </label>
@@ -31,13 +35,15 @@ export default function Login() {
           <input
             type="password"
             id="mewhen-password"
-            className="w-[70%] rounded-md bg-cardMain shadow-sm p-1 border border-black border-opacity-20 font-normal group-hover:border-opacity-70"
+            className={`w-[70%] rounded-md bg-cardMain shadow-sm p-1 border border-black border-opacity-20 font-normal group-hover:border-opacity-70 ${isHovered ? 'outline outline-1 outline-green-600' : 'outline-none'}`}
             required
           />
         </label>
         <button
           type="submit"
           className="rounded-lg shadow-sm hover:shadow-md border border-black"
+          onMouseOver={() => setIsHovered(true)}
+          onMouseOut={() => setIsHovered(false)}
         >
           <span className="flex justify-end p-1 pr-3">login</span>
         </button>
