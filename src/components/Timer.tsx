@@ -5,14 +5,17 @@ import { Link } from 'react-router-dom';
 import NavigationButtons from './NavigationButtons';
 import { useEffect, useState } from 'react';
 import { getUserProfile, logout } from '../slices/userSlice';
+import { createTodo, fetchUserTodos } from '../slices/todoSlice';
 
 export default function Timer() {
   const dispatch = useDispatch<AppDispatch>();
+  const user = useSelector((state: RootState) => state.user.user);
+  const todos = useSelector((state: RootState) => state.todo.todos);
+  const isAuthed = useSelector((state: RootState) => state.user.isAuthed);
   const [isAddTodo, setIsAddTodo] = useState(false);
   const [NewTodo, setNewTodo] = useState('');
-  const user = useSelector((state: RootState) => state.user.user);
-  const isAuthed = user ? true : false;
 
+  // Fetch user profile when token is present
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -20,7 +23,22 @@ export default function Timer() {
     }
   }, [dispatch]);
 
-  const logoutHandler = () => dispatch(logout());
+  // Fetch user todos when user is authenticated
+  useEffect(() => {
+    if (isAuthed) {
+      dispatch(fetchUserTodos());
+    }
+  }, [dispatch, isAuthed]);
+
+  const logoutHandler = () => {
+    dispatch(logout());
+  };
+
+  const createTodoHandler = async () => {
+    await dispatch(createTodo({ title: NewTodo }));
+    setIsAddTodo(false);
+    setNewTodo('');
+  };
 
   return (
     <div className="flex flex-col w-full max-w-4xl mx-auto min-h-[15rem] justify-center items-center gap-2 p-4">
@@ -28,7 +46,7 @@ export default function Timer() {
         <div className="flex flex-row items-center gap-2">
           {isAuthed ? (
             <>
-              <p className="text-xl font-semibold">Hello {user!.name}</p>
+              <p className="text-xl font-semibold">Hello {user.name}</p>
               <button
                 type="button"
                 className="text-blue-700 hover:font-semibold"
@@ -80,10 +98,16 @@ export default function Timer() {
                   onChange={(e) => setNewTodo(e.target.value)}
                 />
                 <button
-                  onClick={() => setIsAddTodo(false)}
+                  onClick={createTodoHandler}
                   className="pl-2 hover:font-semibold"
                 >
                   +add new
+                </button>
+                <button
+                  onClick={() => setIsAddTodo(false)}
+                  className="pl-2 hover:font-semibold"
+                >
+                  back
                 </button>
               </div>
             ) : (
@@ -99,18 +123,37 @@ export default function Timer() {
               </>
             )}
           </div>
-          <div className="flex flex-col justify-center items-center h-full">
-            {isAuthed ? (
-              <>
+
+          {isAuthed ? (
+            todos.length > 0 ? (
+              <ul className="pt-2 overflow-y-auto">
+                {todos.map((todo) => (
+                  <li
+                    key={todo.id}
+                    className="flex flex-row justify-between items-center w-full px-2 "
+                  >
+                    <p className="text-md">{todo.title}</p>
+
+                    <button
+                      onClick={() => alert('Delete Button Clicked')}
+                      className="hover:font-semibold"
+                    >
+                      delete
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="flex flex-col justify-center items-center h-full">
                 <FaRegFrownOpen className="text-4xl mb-2" />
                 <p className="text-xl">no to-do found!</p>
-              </>
-            ) : (
-              <>
-                <p className="text-xl py-4">you need to login!</p>
-              </>
-            )}
-          </div>
+              </div>
+            )
+          ) : (
+            <div className="flex flex-col justify-center items-center h-full">
+              <p className="text-xl py-4">you need to login!</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
