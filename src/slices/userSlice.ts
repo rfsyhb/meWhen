@@ -8,7 +8,7 @@ import apiRequest from '../services/api';
 
 export interface UserState {
   users: User[];
-  user: User;
+  user: User | undefined;
   token: string | null;
   isAuthed: boolean;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
@@ -36,12 +36,7 @@ interface RegisterUserData {
 // Initial state
 const initialState: UserState = {
   users: [],
-  user: {
-    id: '',
-    name: '',
-    username: '',
-    password: '',
-  },
+  user: undefined,
   token: localStorage.getItem('token'),
   isAuthed: !!localStorage.getItem('token'), // !! converts to boolean
   status: 'idle',
@@ -91,12 +86,7 @@ const userSlice = createSlice({
   reducers: {
     logout: (state) => {
       state.token = null;
-      state.user = {
-        id: '',
-        name: '',
-        username: '',
-        password: '',
-      };
+      state.user = undefined;
       state.isAuthed = false;
       localStorage.removeItem('token');
     },

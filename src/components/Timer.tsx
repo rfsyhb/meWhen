@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import NavigationButtons from './NavigationButtons';
 import { useEffect, useState } from 'react';
 import { getUserProfile, logout } from '../slices/userSlice';
-import { createTodo, fetchUserTodos } from '../slices/todoSlice';
+import { createTodo, deleteTodo, fetchUserTodos } from '../slices/todoSlice';
 
 export default function Timer() {
   const dispatch = useDispatch<AppDispatch>();
@@ -40,13 +40,17 @@ export default function Timer() {
     setNewTodo('');
   };
 
+  const deleteTodoHandler = async (id: string) => {
+    await dispatch(deleteTodo(id));
+  };
+
   return (
     <div className="flex flex-col w-full max-w-4xl mx-auto min-h-[15rem] justify-center items-center gap-2 p-4">
       <div className="flex flex-col sm:flex-row w-full justify-between px-6 gap-4 sm:gap-0">
         <div className="flex flex-row items-center gap-2">
           {isAuthed ? (
             <>
-              <p className="text-xl font-semibold">Hello {user.name}</p>
+              <p className="text-xl font-semibold">Hello {user!.name}</p>
               <button
                 type="button"
                 className="text-blue-700 hover:font-semibold"
@@ -135,7 +139,7 @@ export default function Timer() {
                     <p className="text-md">{todo.title}</p>
 
                     <button
-                      onClick={() => alert('Delete Button Clicked')}
+                      onClick={() => deleteTodoHandler(todo.id)}
                       className="hover:font-semibold"
                     >
                       delete
