@@ -8,8 +8,9 @@ import apiRequest from '../services/api';
 
 export interface UserState {
   users: User[];
-  user: User | null;
+  user: User;
   token: string | null;
+  isAuthed: boolean;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
 }
@@ -35,8 +36,14 @@ interface RegisterUserData {
 // Initial state
 const initialState: UserState = {
   users: [],
-  user: null,
+  user: {
+    id: '',
+    name: '',
+    username: '',
+    password: '',
+  },
   token: localStorage.getItem('token'),
+  isAuthed: !!localStorage.getItem('token'), // !! converts to boolean
   status: 'idle',
   error: null,
 };
@@ -84,7 +91,13 @@ const userSlice = createSlice({
   reducers: {
     logout: (state) => {
       state.token = null;
-      state.user = null;
+      state.user = {
+        id: '',
+        name: '',
+        username: '',
+        password: '',
+      };
+      state.isAuthed = false;
       localStorage.removeItem('token');
     },
   },
@@ -100,6 +113,7 @@ const userSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action: PayloadAction<string>) => {
         state.status = 'succeeded';
         state.token = action.payload;
+        state.isAuthed = true;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.status = 'failed';
