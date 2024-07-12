@@ -1,17 +1,34 @@
+import { useState } from 'react';
+import { FaRegFrownOpen } from 'react-icons/fa';
+
 export default function Timer() {
+  const [isAuthed, setIsAuthed] = useState(false);
   return (
     <div className="flex flex-col w-full max-w-4xl mx-auto min-h-[15rem] justify-center items-center gap-2 p-4">
       <div className="flex flex-col sm:flex-row w-full justify-between px-6 gap-4 sm:gap-0">
         <div className="flex flex-row items-center gap-2">
-          <p className="text-xl font-semibold">Hello Rafi Syihab!</p>
-          <a className="text-blue-700" href="github.com" target="_blank">
-            logout?
-          </a>
+          {isAuthed ? (
+            <>
+              <p className="text-xl font-semibold">Hello Rafi Syihab!</p>
+              <a className="text-blue-700" href="github.com" target="_blank">
+                logout?
+              </a>
+            </>
+          ) : (
+            <>
+              <a className="text-blue-700" href="github.com" target="_blank">
+                <span className="text-lg hover:font-semibold">login?</span>
+              </a>
+              <a className="text-blue-700" href="github.com" target="_blank">
+                <span className="text-lg hover:font-semibold">register?</span>
+              </a>
+            </>
+          )}
         </div>
         <div className="flex flex-row gap-3">
           <button
             className="bg-text text-white font-semibold px-4 rounded-xl border-2 border-black"
-            onClick={() => alert('Main Clicked!')}
+            onClick={() => setIsAuthed(!isAuthed)}
           >
             Main
           </button>
@@ -52,8 +69,17 @@ export default function Timer() {
             <p className="text-sm">10 July 2024</p>
             <button onClick={() => alert('added')}>+add</button>
           </div>
-          <div className="flex justify-center items-center h-full">
-            <p className="text-xl py-4">no to-do found!</p>
+          <div className="flex flex-col justify-center items-center h-full">
+            {isAuthed ? (
+              <>
+                <FaRegFrownOpen className="text-4xl mb-2" />
+                <p className="text-xl">no to-do found!</p>
+              </>
+            ) : (
+              <>
+                <p className="text-xl py-4">you need to login!</p>
+              </>
+            )}
           </div>
         </div>
       </div>

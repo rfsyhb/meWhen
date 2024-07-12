@@ -6,7 +6,7 @@ function App() {
   // justify-center untuk x-axis, items-center untuk y-axis
   return (
     <div className="flex justify-center items-center h-screen text-text">
-      <History />
+      <Timer />
     </div>
   );
 }
