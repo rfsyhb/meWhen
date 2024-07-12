@@ -6,6 +6,7 @@ import NavigationButtons from './NavigationButtons';
 import { useEffect, useState } from 'react';
 import { getUserProfile, logout } from '../slices/userSlice';
 import { createTodo, deleteTodo, fetchUserTodos } from '../slices/todoSlice';
+import useTodayDate from '../hooks/useTodayDate';
 
 export default function Timer() {
   const dispatch = useDispatch<AppDispatch>();
@@ -14,6 +15,7 @@ export default function Timer() {
   const isAuthed = useSelector((state: RootState) => state.user.isAuthed);
   const [isAddTodo, setIsAddTodo] = useState(false);
   const [NewTodo, setNewTodo] = useState('');
+  const { todayDate } = useTodayDate();
 
   // Fetch user profile when token is present
   useEffect(() => {
@@ -116,7 +118,7 @@ export default function Timer() {
               </div>
             ) : (
               <>
-                <p className="text-sm">10 July 2024</p>
+                <p className="text-sm">{todayDate}</p>
                 <button
                   onClick={() => setIsAddTodo(true)}
                   className="pl-2 hover:font-semibold"
