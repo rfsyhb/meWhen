@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { loginUser } from '../slices/userSlice';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../app/store';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -25,12 +25,12 @@ export default function Login() {
   return (
     <div className="flex flex-col w-full max-w-xl mx-auto min-h-[15rem] justify-center items-center gap-8 p-4">
       <div className="flex flex-row items-center justify-start gap-2 w-full">
-        <a className="text-blue-700" href="github.com" target="_blank">
-          <span className="text-lg hover:font-semibold">login?</span>
-        </a>
-        <a className="text-blue-700" href="github.com" target="_blank">
+        <Link to="/" className="text-blue-700">
+          <span className="text-lg hover:font-semibold">home?</span>
+        </Link>
+        <Link to="/register" className="text-blue-700">
           <span className="text-lg hover:font-semibold">register?</span>
-        </a>
+        </Link>
       </div>
 
       <form className="flex flex-col w-[70%] gap-3" onSubmit={handleLogin}>
