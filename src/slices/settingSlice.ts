@@ -1,6 +1,17 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-const initialState = {
+// Define the interface for the state
+interface SettingState {
+  mainWebhook: string;
+  reminderWebhook: string;
+  reminderUserId: string;
+  isDiscordEnabled: boolean;
+  timerTitle: string;
+  timerDuration: number; // in minutes
+}
+
+// Initial state
+const initialState: SettingState = {
   mainWebhook: '',
   reminderWebhook: '',
   reminderUserId: '',
@@ -13,22 +24,22 @@ const settingSlice = createSlice({
   name: 'setting',
   initialState,
   reducers: {
-    setMainWebhook: (state, action) => {
+    setMainWebhook: (state, action: PayloadAction<string>) => {
       state.mainWebhook = action.payload;
     },
-    setReminderWebhook: (state, action) => {
+    setReminderWebhook: (state, action: PayloadAction<string>) => {
       state.reminderWebhook = action.payload;
     },
-    setReminderUserId: (state, action) => {
+    setReminderUserId: (state, action: PayloadAction<string>) => {
       state.reminderUserId = action.payload;
     },
-    setDiscordEnabled: (state, action) => {
+    setDiscordEnabled: (state, action: PayloadAction<boolean>) => {
       state.isDiscordEnabled = action.payload;
     },
-    setTimerTitle: (state, action) => {
+    setTimerTitle: (state, action: PayloadAction<string>) => {
       state.timerTitle = action.payload;
     },
-    setTimerDuration: (state, action) => {
+    setTimerDuration: (state, action: PayloadAction<number>) => {
       state.timerDuration = action.payload;
     },
   },
