@@ -5,7 +5,12 @@ import { Link, useLocation } from 'react-router-dom';
 import NavigationButtons from './NavigationButtons';
 import { useEffect, useState } from 'react';
 import { getUserProfile, logout } from '../slices/userSlice';
-import { createTodo, deleteTodo, fetchUserTodos } from '../slices/todoSlice';
+import {
+  createTodo,
+  deleteTodo,
+  fetchUserTodos,
+  updateTodo,
+} from '../slices/todoSlice';
 import useTodayDate from '../hooks/useTodayDate';
 
 export default function Timer() {
@@ -45,6 +50,18 @@ export default function Timer() {
 
   const deleteTodoHandler = async (id: string) => {
     await dispatch(deleteTodo(id));
+  };
+
+  const toggleTodoCompletionHandler = async (
+    id: string,
+    completed: boolean
+  ) => {
+    await dispatch(
+      updateTodo({
+        id,
+        todo: { completed: !completed },
+      })
+    );
   };
 
   return (
@@ -130,7 +147,6 @@ export default function Timer() {
               </>
             )}
           </div>
-
           {isAuthed ? (
             todos.length > 0 ? (
               <ul className="pt-2 overflow-y-auto">
@@ -139,8 +155,14 @@ export default function Timer() {
                     key={todo.id}
                     className="flex flex-row justify-between items-center w-full px-2 "
                   >
-                    <p className="text-md">{todo.title}</p>
-
+                    <p
+                      className={`text-md ${todo.completed ? 'line-through' : ''}`}
+                      onClick={() =>
+                        toggleTodoCompletionHandler(todo.id, todo.completed)
+                      }
+                    >
+                      {todo.title}
+                    </p>
                     <button
                       onClick={() => deleteTodoHandler(todo.id)}
                       className="hover:font-semibold"
