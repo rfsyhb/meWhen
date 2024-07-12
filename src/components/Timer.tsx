@@ -48,9 +48,9 @@ export default function Timer() {
     <div className="flex flex-col w-full max-w-4xl mx-auto min-h-[15rem] justify-center items-center gap-2 p-4">
       <div className="flex flex-col sm:flex-row w-full justify-between px-6 gap-4 sm:gap-0">
         <div className="flex flex-row items-center gap-2">
-          {isAuthed ? (
+          {isAuthed && user ? (
             <>
-              <p className="text-xl font-semibold">Hello {user!.name}</p>
+              <p className="text-xl font-semibold">Hello {user.name}</p>
               <button
                 type="button"
                 className="text-blue-700 hover:font-semibold"
