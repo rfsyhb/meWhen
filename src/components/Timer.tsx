@@ -1,7 +1,7 @@
 import { FaRegFrownOpen } from 'react-icons/fa';
 import { AppDispatch, RootState } from '../app/store';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import NavigationButtons from './NavigationButtons';
 import { useEffect, useState } from 'react';
 import { getUserProfile, logout } from '../slices/userSlice';
@@ -16,6 +16,7 @@ export default function Timer() {
   const [isAddTodo, setIsAddTodo] = useState(false);
   const [NewTodo, setNewTodo] = useState('');
   const { todayDate } = useTodayDate();
+  const location = useLocation();
 
   // Fetch user profile when token is present
   useEffect(() => {
@@ -72,7 +73,7 @@ export default function Timer() {
             </>
           )}
         </div>
-        <NavigationButtons />
+        <NavigationButtons location={location.pathname} />
       </div>
       <div className="flex flex-col md:flex-row w-full h-auto md:h-48 justify-center gap-4">
         <div className="flex flex-col md:flex-row w-full md:w-[50%] justify-center items-center rounded-xl gap-3 md:gap-8 bg-cardMain shadow-md p-4">
