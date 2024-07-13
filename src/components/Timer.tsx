@@ -3,7 +3,7 @@ import { AppDispatch, RootState } from '../app/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
 import NavigationButtons from './NavigationButtons';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getUserProfile, logout } from '../slices/userSlice';
 import {
   createTodo,
@@ -11,17 +11,36 @@ import {
   fetchUserTodos,
   updateTodo,
 } from '../slices/todoSlice';
+import {
+  start,
+  stop,
+  reset,
+  startReminding,
+  stopReminding,
+  tick,
+} from '../slices/timerSlice';
 import useTodayDate from '../hooks/useTodayDate';
+import useTimeNow from '../hooks/useTimeNow';
+import { add } from '../slices/historySlice';
+import axios from 'axios';
 
 export default function Timer() {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.user.user);
   const todos = useSelector((state: RootState) => state.todo.todos);
   const isAuthed = useSelector((state: RootState) => state.user.isAuthed);
+  const time = useSelector((state: RootState) => state.timer.time);
+  const isRunning = useSelector((state: RootState) => state.timer.isRunning);
+  const setting = useSelector((state: RootState) => state.setting);
+  const isReminding = useSelector(
+    (state: RootState) => state.timer.isReminding
+  );
   const [isAddTodo, setIsAddTodo] = useState(false);
   const [NewTodo, setNewTodo] = useState('');
-  const { todayDate } = useTodayDate();
-  const location = useLocation();
+  const { todayDate } = useTodayDate(); // Custom hook
+  const { timeNow } = useTimeNow(); // Custom hook
+  const location = useLocation(); // React Router hook
+  const workerRef = useRef<Worker | null>(null);
 
   // Fetch user profile when token is present
   useEffect(() => {
@@ -40,6 +59,139 @@ export default function Timer() {
 
   const logoutHandler = () => {
     dispatch(logout());
+  };
+
+  // Timer worker
+  useEffect(() => {
+    workerRef.current = new Worker(
+      new URL('../utils/timerWorker.ts', import.meta.url)
+    );
+
+    workerRef.current.onmessage = (event) => {
+      if (event.data === 'tick') {
+        dispatch(tick());
+      } else if (event.data.type === 'reset') {
+        dispatch(reset(event.data.duration));
+      }
+    };
+
+    return () => {
+      workerRef.current?.terminate();
+    };
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (isRunning) {
+      workerRef.current?.postMessage({ type: 'start' });
+    } else {
+      workerRef.current?.postMessage({ type: 'stop' });
+    }
+  }, [isRunning]);
+
+  useEffect(() => {
+    if (time === 0 && isRunning) {
+      const historyData = {
+        title: setting.timerTitle,
+        time: setting.timerDuration,
+      };
+      dispatch(add(historyData));
+      dispatch(stop());
+
+      // Post to Discord if enabled
+      if (setting.isDiscordEnabled && setting.mainWebhook) {
+        axios
+          .post(setting.mainWebhook, {
+            content: `[${timeNow}] [${todayDate}], "${historyData.title}" - ${historyData.time} min, finished.`,
+          })
+          .then(() => {
+            console.log('Discord message sent!');
+          })
+          .catch((err) => {
+            console.error('Error postng to Discord:', err);
+          });
+      }
+
+      if (
+        setting.reminderWebhook.length > 1 &&
+        setting.reminderUserId.length > 1
+      ) {
+        dispatch(startReminding());
+        workerRef.current?.postMessage({
+          type: 'startReminder',
+          isReminding: true,
+          reminderWebhook: setting.reminderWebhook,
+        });
+      }
+    }
+  }, [time, isRunning, dispatch, setting, timeNow, todayDate, isReminding]);
+
+  // handling reminder interval
+  useEffect(() => {
+    let reminderInterval: number | undefined;
+    if (
+      isReminding &&
+      setting.reminderUserId.length > 1 &&
+      setting.reminderWebhook.length > 1
+    ) {
+      reminderInterval = setInterval(() => {
+        axios
+          .post(setting.reminderWebhook, {
+            content: `<@${setting.reminderUserId}> tolong tekan done!`,
+            allowed_nmentions: {
+              users: [setting.reminderUserId],
+            },
+          })
+          .then(() => {
+            console.log('Reminder sent!');
+          })
+          .catch((err) => {
+            console.error('Error posting reminder:', err);
+          });
+      }, 15000); // 15 seconds
+    }
+
+    return () => {
+      if (reminderInterval) {
+        clearInterval(reminderInterval);
+      }
+    };
+  }, [isReminding, setting.reminderWebhook, setting.reminderUserId]);
+
+  // Reset timer when timer duration changes
+  useEffect(() => {
+    if (!isRunning) {
+      dispatch(reset(setting.timerDuration * 60));
+    }
+  }, [dispatch, isRunning, setting.timerDuration]);
+
+  const handleStart = () => {
+    if (setting.timerTitle.length > 1) {
+      dispatch(reset(setting.timerDuration * 60));
+      dispatch(start());
+    } else {
+      alert('u forgor to add title ser!');
+    }
+  };
+
+  const handleReset = () => {
+    dispatch(reset(setting.timerDuration * 60));
+    workerRef.current?.postMessage({
+      type: 'reset',
+      duration: setting.timerDuration,
+    });
+  };
+
+  const handleStopReminder = () => {
+    dispatch(stopReminding());
+    workerRef.current?.postMessage({ type: 'stopReminder' });
+  };
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60)
+      .toString()
+      .padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
   };
 
   const createTodoHandler = async () => {
@@ -93,18 +245,33 @@ export default function Timer() {
         <NavigationButtons location={location.pathname} />
       </div>
       <div className="flex flex-col md:flex-row w-full h-auto md:h-48 justify-center gap-4">
-        <div className="flex flex-col md:flex-row w-full md:w-[50%] justify-center items-center rounded-xl gap-3 md:gap-8 bg-cardMain shadow-md p-4">
-          <p className="text-6xl md:text-8xl font-bold">25:00</p>
+        <div className="flex flex-col md:flex-row w-full md:w-[50%] justify-center items-center rounded-xl gap-3 bg-cardMain shadow-md p-8">
+          <div className="flex flex-col flex-grow items-center">
+            <p
+              className={`${!isReminding ? '' : 'hidden'} text-6xl md:text-8xl font-bold`}
+            >
+              {formatTime(time)}
+            </p>
+            <button
+              type="button"
+              className={`${!isReminding ? 'hidden' : ''} border border-black w-full p-4 rounded-2xl shadow-md font-bold bg-black text-white hover:bg-white hover:text-black`}
+              onClick={handleStopReminder}
+            >
+              done!
+            </button>
+          </div>
           <div className="flex md:flex-col gap-2">
             <button
-              className="font-semibold px-4 py-1 bg-white rounded-md border border-black hover:bg-text hover:text-white hover:border-black"
-              onClick={() => alert('Start Button Clicked')}
+              className={`${isRunning ? 'bg-black text-white' : 'bg-white text-black'} font-semibold px-4 py-1 bg-white rounded-md border border-black hover:bg-text hover:text-white hover:border-black`}
+              onClick={handleStart}
+              disabled={isRunning}
             >
               Start
             </button>
             <button
-              className="font-semibold px-4 py-1 bg-white rounded-md border border-black hover:bg-text hover:text-white hover:border-black"
-              onClick={() => alert('Pause Button Clicked')}
+              className="font-semibold px-4 py-1 bg-white rounded-md border border-black hover:text-white hover:border-black hover:bg-red-400"
+              onClick={handleReset}
+              disabled={!isRunning}
             >
               Reset
             </button>
@@ -156,7 +323,7 @@ export default function Timer() {
                     className="flex flex-row justify-between items-center w-full px-2 "
                   >
                     <p
-                      className={`text-md ${todo.completed ? 'line-through' : ''}`}
+                      className={`text-md cursor-pointer hover:font-semibold ${todo.completed ? 'line-through' : ''}`}
                       onClick={() =>
                         toggleTodoCompletionHandler(todo.id, todo.completed)
                       }
