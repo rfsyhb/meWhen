@@ -248,7 +248,7 @@ export default function Timer() {
           </div>
           <div className="flex md:flex-col gap-2">
             <button
-              className={`${isRunning ? 'bg-black text-white' : 'bg-white text-black'} font-semibold px-4 py-1 bg-white rounded-md border border-black hover:bg-text hover:text-white hover:border-black`}
+              className={`font-semibold px-4 py-1 rounded-md border border-black hover:bg-text hover:text-white hover:border-black ${isRunning ? 'bg-black text-white cursor-not-allowed' : 'bg-white text-black'}`}
               onClick={handleStart}
               disabled={isRunning}
             >
