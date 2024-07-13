@@ -72,13 +72,31 @@ export default function Timer() {
         dispatch(tick());
       } else if (event.data.type === 'reset') {
         dispatch(reset(event.data.duration));
+      } else if (
+        event.data.type === 'sendReminder' &&
+        event.data.reminderWebhook
+      ) {
+        console.log('Handling sendReminder in Timer component...');
+        axios
+          .post(event.data.reminderWebhook, {
+            content: `<@${setting.reminderUserId}> tolong tekan done!`,
+            allowed_mentions: {
+              users: [setting.reminderUserId],
+            },
+          })
+          .then(() => {
+            console.log('Reminder sent!');
+          })
+          .catch((err) => {
+            console.error('Error posting reminder:', err);
+          });
       }
     };
 
     return () => {
       workerRef.current?.terminate();
     };
-  }, [dispatch]);
+  }, [dispatch, setting.reminderUserId]);
 
   useEffect(() => {
     if (isRunning) {
@@ -115,6 +133,7 @@ export default function Timer() {
         setting.reminderWebhook.length > 1 &&
         setting.reminderUserId.length > 1
       ) {
+        console.log('Dispatching startReminding...');
         dispatch(startReminding());
         workerRef.current?.postMessage({
           type: 'startReminder',
@@ -123,39 +142,7 @@ export default function Timer() {
         });
       }
     }
-  }, [time, isRunning, dispatch, setting, timeNow, todayDate, isReminding]);
-
-  // handling reminder interval
-  useEffect(() => {
-    let reminderInterval: number | undefined;
-    if (
-      isReminding &&
-      setting.reminderUserId.length > 1 &&
-      setting.reminderWebhook.length > 1
-    ) {
-      reminderInterval = setInterval(() => {
-        axios
-          .post(setting.reminderWebhook, {
-            content: `<@${setting.reminderUserId}> tolong tekan done!`,
-            allowed_nmentions: {
-              users: [setting.reminderUserId],
-            },
-          })
-          .then(() => {
-            console.log('Reminder sent!');
-          })
-          .catch((err) => {
-            console.error('Error posting reminder:', err);
-          });
-      }, 15000); // 15 seconds
-    }
-
-    return () => {
-      if (reminderInterval) {
-        clearInterval(reminderInterval);
-      }
-    };
-  }, [isReminding, setting.reminderWebhook, setting.reminderUserId]);
+  }, [time, isRunning, dispatch, setting, timeNow, todayDate]);
 
   // Reset timer when timer duration changes
   useEffect(() => {
