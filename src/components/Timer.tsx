@@ -42,20 +42,19 @@ export default function Timer() {
   const location = useLocation(); // React Router hook
   const workerRef = useRef<Worker | null>(null);
 
-  // Fetch user profile when token is present
+  // Fetch user profile when token is present and fetch todos if user is authenticated
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      dispatch(getUserProfile());
-    }
+    const fetchUserData = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        const resultAction = await dispatch(getUserProfile());
+        if (getUserProfile.fulfilled.match(resultAction)) {
+          dispatch(fetchUserTodos());
+        }
+      }
+    };
+    fetchUserData();
   }, [dispatch]);
-
-  // Fetch user todos when user is authenticated
-  useEffect(() => {
-    if (isAuthed) {
-      dispatch(fetchUserTodos());
-    }
-  }, [dispatch, isAuthed]);
 
   const logoutHandler = () => {
     dispatch(logout());

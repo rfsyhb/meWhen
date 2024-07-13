@@ -74,12 +74,13 @@ export const fetchUsers: AsyncThunk<User[], void, object> = createAsyncThunk<
 export const getUserProfile: AsyncThunk<User, void, object> = createAsyncThunk<
   User,
   void
->('user/getUserProfile', async () => {
+>('user/getUserProfile', async (_, thunkAPI) => {
   try {
     const response = await apiRequest('get', 'users/me');
     return response.data.user;
   } catch (err) {
     localStorage.removeItem('token');
+    return thunkAPI.rejectWithValue('Token invalid or request failed');
   }
 });
 
@@ -122,6 +123,7 @@ const userSlice = createSlice({
         (state, action: PayloadAction<User>) => {
           state.status = 'succeeded';
           state.user = action.payload;
+          state.isAuthed = true;
         }
       )
       .addCase(getUserProfile.rejected, (state, action) => {
