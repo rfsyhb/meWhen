@@ -1,6 +1,12 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-const initialState = {
+export interface TimerState {
+  time: number;
+  isRunning: boolean;
+  isReminding: boolean;
+}
+
+const initialState: TimerState = {
   time: 1500, // 25 minutes, default
   isRunning: false,
   isReminding: false, // Whether the timer is reminding the user
@@ -16,7 +22,7 @@ const timerSlice = createSlice({
     stop: (state) => {
       state.isRunning = false;
     },
-    reset: (state, action) => {
+    reset: (state, action: PayloadAction<number | undefined>) => {
       state.time = action.payload || 1500;
       state.isRunning = false;
     },
@@ -29,7 +35,7 @@ const timerSlice = createSlice({
     tick: (state) => {
       state.time -= 1; // Decrement time by 1 second
     },
-    setTime: (state, action) => {
+    setTime: (state, action: PayloadAction<number>) => {
       state.time = action.payload;
     },
   },
