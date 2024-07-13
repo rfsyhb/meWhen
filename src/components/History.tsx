@@ -10,7 +10,7 @@ import { useEffect } from 'react';
 // Define a type for history items
 interface HistoryItem {
   title: string;
-  time: string;
+  time: number;
 }
 
 export default function History() {
