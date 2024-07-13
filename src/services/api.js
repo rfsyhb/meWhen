@@ -33,10 +33,17 @@ const apiRequest = async (method, endpoint, data) => {
     // }
     return responseData;
   } catch (error) {
-    console.error('API request error: ', error.response || error.message);
-    throw new Error(
-      error.response?.data?.message || error.message || 'Something went wrong'
-    );
+    let errorMessage = 'Something went wrong';
+    if (error.response) {
+      errorMessage = error.response.data?.message || error.message;
+    } else if (error.request) {
+      errorMessage = 'No response received from server';
+    } else {
+      errorMessage = error.message;
+    }
+    console.error('API request error: ', error);
+    // alert(errorMessage); // Show alert with the error message
+    throw new Error(errorMessage);
   }
 };
 
