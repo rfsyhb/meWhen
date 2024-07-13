@@ -4,7 +4,7 @@ import { getTodayDateKey } from '../utils/helper';
 // Define the interface for a history entry
 interface HistoryEntry {
   title: string;
-  time: string;
+  time: number;
 }
 
 // Define the interface for the state

@@ -75,8 +75,12 @@ export const getUserProfile: AsyncThunk<User, void, object> = createAsyncThunk<
   User,
   void
 >('user/getUserProfile', async () => {
-  const response = await apiRequest('get', 'users/me');
-  return response.data.user;
+  try {
+    const response = await apiRequest('get', 'users/me');
+    return response.data.user;
+  } catch (err) {
+    localStorage.removeItem('token');
+  }
 });
 
 // Slice
@@ -119,7 +123,13 @@ const userSlice = createSlice({
           state.status = 'succeeded';
           state.user = action.payload;
         }
-      );
+      )
+      .addCase(getUserProfile.rejected, (state, action) => {
+        state.status = 'failed';
+        state.user = null;
+        state.isAuthed = false;
+        state.error = action.error.message || null;
+      });
   },
 });
 
