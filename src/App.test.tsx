@@ -1,91 +1,63 @@
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from './app/store';
 import App from './App';
 
-describe('App Component', () => {
-  test('renders Timer component on default route', () => {
-    render(
-      <Provider store={store}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </Provider>
-    );
+// Helper function to render component with providers and route
+const renderWithProviders = (
+  ui: React.ReactElement,
+  { route = '/' } = {},
+  pageName: string = 'Test page'
+) => {
+  window.history.pushState({}, pageName, route);
 
+  return render(
+    <Provider store={store}>
+      <MemoryRouter initialEntries={[route]}>{ui}</MemoryRouter>
+    </Provider>
+  );
+};
+
+describe('App Component', () => {
+  beforeEach(() => {
+    window.history.pushState({}, 'Test Page', '/');
+  });
+
+  test('renders Timer component on default route', () => {
+    renderWithProviders(<App />, { route: '/' }, 'Main');
     expect(screen.getByRole('button', { name: /Main/i })).toBeInTheDocument(); // memunculkan button Main
   });
 
   test('renders Setting component on /setting route', () => {
-    window.history.pushState({}, 'Setting Page', '/setting');
-    render(
-      <Provider store={store}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </Provider>
-    );
-
+    renderWithProviders(<App />, { route: '/setting' }, 'Setting');
     expect(
       screen.getByRole('button', { name: /Setting/i })
     ).toBeInTheDocument(); // memunculkan button Setting
   });
 
-  test('render History component on /history route', () => {
-    window.history.pushState({}, 'History Page', '/history');
-    render(
-      <Provider store={store}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </Provider>
-    );
-
+  test('renders History component on /history route', () => {
+    renderWithProviders(<App />, { route: '/history' }, 'History');
     expect(
       screen.getByRole('button', { name: /History/i })
     ).toBeInTheDocument(); // memunculkan button History
   });
 
-  test('render Login component on /login route', () => {
-    window.history.pushState({}, 'Login Page', '/login');
-    render(
-      <Provider store={store}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </Provider>
-    );
-
+  test('renders Login component on /login route', () => {
+    renderWithProviders(<App />, { route: '/login' }, 'Login');
     expect(screen.getByRole('button', { name: /Login/i })).toBeInTheDocument(); // memunculkan button Login
   });
 
-  test('render Register component on /register route', () => {
-    window.history.pushState({}, 'Register Page', '/register');
-    render(
-      <Provider store={store}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </Provider>
-    );
-
+  test('renders Register component on /register route', () => {
+    renderWithProviders(<App />, { route: '/register' }, 'Register');
     expect(
       screen.getByRole('button', { name: /Register/i })
     ).toBeInTheDocument(); // memunculkan button Register
   });
 
   test('renders NotFound component on invalid route', () => {
-    window.history.pushState({}, 'Test Page', '/invalid-route');
-    render(
-      <Provider store={store}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </Provider>
-    );
-
+    renderWithProviders(<App />, { route: '/invalid-route' }, 'Not Found');
     expect(screen.getByText(/Not Found/i)).toBeInTheDocument(); // memunculkan text Not Found
   });
 });
