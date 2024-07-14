@@ -1,7 +1,7 @@
 import { FaRegFrownOpen, FaTrash } from 'react-icons/fa';
 import { useLocation } from 'react-router-dom';
 import { AppDispatch, RootState } from '../app/store';
-import NavigationButtons from './NavigationButtons';
+import NavigationButtons from './common/NavigationButtons';
 import { useDispatch, useSelector } from 'react-redux';
 import useTodayDate from '../hooks/useTodayDate';
 import { clear, loadHistory } from '../slices/historySlice';

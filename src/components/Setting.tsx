@@ -1,4 +1,4 @@
-import NavigationButtons from './NavigationButtons';
+import NavigationButtons from './common/NavigationButtons.tsx';
 import { useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { AppDispatch, RootState } from '../app/store';
