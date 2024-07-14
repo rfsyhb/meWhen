@@ -22,4 +22,12 @@ module.exports = {
     ],
     'prettier/prettier': 'warn',
   },
+  overrides: [
+    {
+      files: ['*.ts', '*.tsx'],
+      rules: {
+        'react/prop-types': 'off',
+      },
+    },
+  ],
 };
