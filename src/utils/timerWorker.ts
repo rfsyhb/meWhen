@@ -1,10 +1,16 @@
 let intervalId: number | undefined;
 let reminderIntervalId: number | undefined;
 
-interface WorkerMessage {
+export interface WorkerMessage {
   type: 'start' | 'stop' | 'reset' | 'startReminder' | 'stopReminder';
   duration?: number;
   isReminding?: boolean;
+  reminderWebhook?: string;
+}
+
+export interface WorkerResponse {
+  type: 'reset' | 'sendReminder';
+  duration?: number;
   reminderWebhook?: string;
 }
 

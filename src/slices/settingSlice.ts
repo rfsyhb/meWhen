@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 // Define the interface for the state
-interface SettingState {
+export interface SettingState {
   mainWebhook: string;
   reminderWebhook: string;
   reminderUserId: string;
