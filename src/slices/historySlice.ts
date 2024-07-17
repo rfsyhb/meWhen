@@ -8,7 +8,7 @@ interface HistoryEntry {
 }
 
 // Define the interface for the state
-interface HistoryState {
+export interface HistoryState {
   history: HistoryEntry[]; // array of history entries
 }
 
