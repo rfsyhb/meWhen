@@ -17,7 +17,7 @@ const UserProfileSection: React.FC = () => {
     <div className="flex flex-row items-center gap-2">
       {isAuthed && user ? (
         <>
-          <p className="text-xl font-semibold">Hellp {user.name}</p>
+          <p className="text-xl font-semibold">Hello {user.name}</p>
           <button
             type="button"
             className="text-blue-700 hover:font-semibold"
