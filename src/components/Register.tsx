@@ -22,8 +22,8 @@ export default function Register() {
       ).unwrap();
       alert('Registration successful!');
       navigate('/login');
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      alert(error.message);
     }
   };
 

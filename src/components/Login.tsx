@@ -19,8 +19,8 @@ export default function Login() {
       await dispatch(loginUser({ username, password })).unwrap();
       alert('Login successful!');
       navigate('/');
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      alert(error.message);
     }
   };
 
