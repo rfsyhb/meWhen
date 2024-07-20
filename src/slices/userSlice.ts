@@ -80,7 +80,7 @@ export const getUserProfile: AsyncThunk<User, void, object> = createAsyncThunk<
     return response.data.user;
   } catch (err) {
     localStorage.removeItem('token');
-    return thunkAPI.rejectWithValue('Token invalid or request failed');
+    return thunkAPI.rejectWithValue('Token invalid, please log in again');
   }
 });
 
@@ -94,6 +94,7 @@ const userSlice = createSlice({
       state.user = null;
       state.isAuthed = false;
       localStorage.removeItem('token');
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -130,7 +131,7 @@ const userSlice = createSlice({
         state.status = 'failed';
         state.user = null;
         state.isAuthed = false;
-        state.error = action.error.message || null;
+        state.error = action.payload as string;
       });
   },
 });
